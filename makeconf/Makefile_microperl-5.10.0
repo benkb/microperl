@@ -1,0 +1,15 @@
+
+LD = $(CC)
+CCFLAGS = -c
+DEFINES = -DPERL_CORE -DPERL_MICRO -DSTANDARD_C -DPERL_USE_SAFE_PUTENV
+OPTIMIZE = 
+CFLAGS = $(CC_CONF) $(DEFINES) $(OPTIMIZE)
+LDFLAGS = 
+LIBS = -lm
+_O = .o
+ENV = env
+PERL = perl
+_X = 
+RUN = 
+
+include Makefile.micro

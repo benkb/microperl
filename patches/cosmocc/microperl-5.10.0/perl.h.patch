@@ -1,0 +1,17 @@
+--- perlsrc/perl-5.10.0/perl.h	2007-12-18 11:47:08
++++ microsrc/perl.h	2024-06-27 02:41:49
+@@ -3487,10 +3487,10 @@
+
+ #ifndef __cplusplus
+ #if !(defined(UNDER_CE) || defined(SYMBIAN))
+-Uid_t getuid (void);
+-Uid_t geteuid (void);
+-Gid_t getgid (void);
+-Gid_t getegid (void);
++Uid_t getuid_ (void);
++Uid_t geteuid_ (void);
++Gid_t getgid_ (void);
++Gid_t getegid_ (void);
+ #endif
+ #endif
+

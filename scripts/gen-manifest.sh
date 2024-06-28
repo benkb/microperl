@@ -12,8 +12,8 @@ set -u
 
 USAGE='<source dir> [manifest input]'
 
-source_dir="${1:-}"
-manifest_in="${2:-}"
+SOURCE_DIR="${1:-}"
+MANIFEST_IN="${2:-}"
 
 die() {
 	echo "$@" >&2
@@ -21,23 +21,23 @@ die() {
 }
 # stamp="$(date +'%Y%m%d%H%M')"
 
-[ -n "$source_dir" ] || die "usage: $USAGE"
-[ -d "$source_dir" ] || die "Err: input dir not exists in '$source_dir'"
+[ -n "$SOURCE_DIR" ] || die "usage: $USAGE"
+[ -d "$SOURCE_DIR" ] || die "Err: input dir not exists in '$SOURCE_DIR'"
 
-perl_name="$(basename "$source_dir")"
+perl_name="$(basename "$SOURCE_DIR")"
 
-manifest_in=
+MANIFEST_IN=
 manifest_out=
-if [ -z "$manifest_in" ]; then
-	manifest_in="artifacts/MANIFEST_$perl_name.in"
-	[ -f "$manifest_in" ] || manifest_in="artifacts/MANIFEST__default.in"
+if [ -z "$MANIFEST_IN" ]; then
+	MANIFEST_IN="manifests/MANIFEST_$perl_name.inc"
+	[ -f "$MANIFEST_IN" ] || MANIFEST_IN="manifests/MANIFEST__default.inc"
 	manifest_out="MANIFEST_$perl_name"
 fi
-[ -f "$manifest_in" ] || die "Err: no valid manifest input under '$manifest_in'"
+[ -f "$MANIFEST_IN" ] || die "Err: no valid manifest input under '$MANIFEST_IN'"
 
 rm -f "$manifest_out"
 
-makefile_micro="$source_dir/Makefile.micro"
+makefile_micro="$SOURCE_DIR/Makefile.micro"
 [ -f "$makefile_micro" ] || die "Err: makefile_micro not exists in '$makefile_micro'"
 
 print_file() {
@@ -54,7 +54,7 @@ print_file() {
 		filename="${fileitem##*/}"
 		;;
 	*)
-		file="$source_dir/$fileitem"
+		file="$SOURCE_DIR/$fileitem"
 		filename="${fileitem}"
 		;;
 	esac
@@ -62,19 +62,19 @@ print_file() {
 	if [ -f "$file" ]; then
 		echo "$filename"
 	else
-		echo "Warn: cannot find '$file'" >&2
+		echo "Info: cannot find '$fileitem' that was detected by parsing include statements" >&2
 	fi
 
 	case "$filename" in
 	*.c)
 		local filebase="${filename%.*}"
 		local hfile="$filebase.h"
-		[ -f "$source_dir/$hfile" ] && echo "$hfile"
+		[ -f "$SOURCE_DIR/$hfile" ] && echo "$hfile"
 		;;
 	*.h)
 		local filebase="${filename%.*}"
 		local cfile="$filebase.c"
-		[ -f "$source_dir/$cfile" ] && echo "$cfile"
+		[ -f "$SOURCE_DIR/$cfile" ] && echo "$cfile"
 		;;
 	*) ;;
 	esac
@@ -82,16 +82,16 @@ print_file() {
 
 while read -r filename; do
 	print_file "$filename"
-done <"$manifest_in" >"$manifest_out"
+done <"$MANIFEST_IN" >"$manifest_out"
 
 for regex in 'while ($_ =~ /([a-zA-Z0-9_]+\.h)/g) {print "$1\n"}' 'if(/\:\s*\$\(H[A-Z]*\)(.*)/){ $v=$1; $v=~ s/\s/\n/g ;  print "$v\n"; }' 'if(/\$\(_O\)\:\s+([a-zA-Z0-9_]+.c)/){ print "$1\n" }'; do
 	perl -ne "$regex" "$makefile_micro" | while read filename; do
 		[ -n "$filename" ] || continue
-		file="$source_dir/$filename"
+		file="$SOURCE_DIR/$filename"
 		if [ -f "$file" ]; then
 			echo "$file"
 		else
-			echo "Warn could not find file '$file' for filename '$filename'" >&2
+			echo "Info: cannot find file '$filename' detected in '$makefile_micro'" >&2
 		fi
 	done
 done | xargs perl -lne '/\#include "([a-zA-Z0-9_-]+\.[c|h])"/ && print $1; print $ARGV' | while read fileitem; do
@@ -100,4 +100,4 @@ done | sort | uniq >>"$manifest_out"
 
 echo '------'
 echo "written to '$manifest_out'"
-echo "with input from '$manifest_in'"
+echo "with input from '$SOURCE_DIR' and '$MANIFEST_IN'"
