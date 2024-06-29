@@ -101,6 +101,19 @@ fi
 
 [ -n "$cc_conf" ] || die "Err: could not find cc_conf"
 
+makefile_micro="$MICROPERL/Makefile.micro"
+
+makefile_micro_include_name="makefile_micro.mk"
+makefile_micro_include="$MICROPERL/$makefile_micro_include_name"
+
+[ -f "$makefile_micro" ] || die "Err: makefile_micro not exists in '$makefile_micro'"
+perl -ne 'BEGIN{$p}; $p=1 if /^all:[\s\t]*microperl\s$/; print if $p' "$makefile_micro" > "$makefile_micro_include"
+
+rm -f "$makefile_micro"
+
+echo "Ok: changed Makefile.micro to include file '$makefile_micro_include_name'"
+
+
 triple_makefile_name="Makefile_${compiler_conf_triple}"
 triple_makefile="$MICROPERL/$triple_makefile_name"
 
@@ -110,8 +123,11 @@ makefile_microperl="$MAKECONF_DIR/Makefile_$MICROPERL"
     echo "CC = $compiler_path" 
     echo "CC_CONF = $cc_conf"
     cat "$makefile_microperl"
+    echo ''
+    echo "include $makefile_micro_include_name"
 } > "$triple_makefile"
 echo "Ok: triple Makefile file written '$triple_makefile'"
+
 
 rm -f "$MICROPERL/Makefile"
 ln -s "$triple_makefile_name" "$MICROPERL/Makefile"

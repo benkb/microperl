@@ -12,4 +12,3 @@ PERL = perl
 _X = 
 RUN = 
 
-include Makefile.micro

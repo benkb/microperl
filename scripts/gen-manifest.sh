@@ -31,7 +31,7 @@ manifest_out=
 if [ -z "$MANIFEST_IN" ]; then
 	MANIFEST_IN="manifests/MANIFEST_$perl_name.inc"
 	[ -f "$MANIFEST_IN" ] || MANIFEST_IN="manifests/MANIFEST__default.inc"
-	manifest_out="MANIFEST_$perl_name"
+	manifest_out="MANIFEST_$perl_name.txt"
 fi
 [ -f "$MANIFEST_IN" ] || die "Err: no valid manifest input under '$MANIFEST_IN'"
 

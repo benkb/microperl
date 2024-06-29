@@ -4,6 +4,7 @@ parser.h
 uconfig.sh
 perly.y
 config_h.SH
+Makefile.micro
 EXTERN.h
 INTERN.h
 XSUB.h

@@ -38,14 +38,16 @@ output_dir="${1:-}"
 
 perltitle=; perltitle="$(basename "$INPUT_DIR")"
 
-[ -z "$manifest_path" ] && manifest_path="manifests/MANIFEST_${perltitle}"
+[ -z "$manifest_path" ] && manifest_path="manifests/MANIFEST_${perltitle}.txt"
 [ -f "$manifest_path" ] || die "Err: no manifest file under '$manifest_path'"
 
 manifest_filename=; manifest_filename="$(basename "$manifest_path")"
 
 manifest_perltitle=
 case "$manifest_filename" in
-    MANIFEST_*) manifest_perltitle="${manifest_filename#*_}";;
+    MANIFEST_*) 
+        manifest_perltitle_base="${manifest_filename%.*}"
+        manifest_perltitle="${manifest_perltitle_base#*_}";;
     *) die "Err: manifest filename looks invalid '$manifest_filename'" ;;
 esac
 
